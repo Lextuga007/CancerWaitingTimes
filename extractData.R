@@ -77,8 +77,6 @@ weekWait <- `data/cancerWaitingTimes-Two Week Wait.csv` %>%
                         TRUE ~x2)) %>% 
   filter(x1 != 'Operational Standard = 93%') 
 
-
-
 # switch rows for dates to below header -----------------------------------
 
 weekWaitDate <- weekWait %>% 
@@ -87,8 +85,13 @@ weekWaitDate <- weekWait %>%
                names_to = "categories",
                values_to = "values") %>% 
   fill(values, .direction = "down") %>% 
+  # strips the dates which are written out and have no data
+  mutate(values = excel_numeric_to_date(as.numeric(values), date_system = "modern"),
+         values = as.character(values)) %>% 
   pivot_wider(names_from = categories,
-              values_from = values)
+              values_from = values) 
 
-weekWaitAll <- weekWaitDate %>% 
-  union_all(weekWaitAll)
+
+weekWaitComplete <- weekWaitDate %>% 
+  union_all(weekWaitAll %>% 
+              filter(x1 != 'dates'))
