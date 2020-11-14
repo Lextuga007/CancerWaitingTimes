@@ -50,3 +50,45 @@ for(j in 1:length(files_list)){
 }
 
 
+# Reload csvs Two Week Wait tabs-------------------------------------
+
+files_list_sheets <- list.files(path = "data",
+                                pattern = "Two Week Wait",
+                                full.names = TRUE
+)
+
+for(i in files_list_sheets) {
+  
+  x <- read_csv((i), col_types = cols(.default = col_character()))
+  
+  assign(i, x)
+}
+
+
+# Format data ------------------------------------------------------------
+
+weekWait <- `data/cancerWaitingTimes-Two Week Wait.csv` %>% 
+  clean_names() %>% 
+  remove_empty() %>% 
+  rename(x1 = two_week_wait_from_gp_urgent_referral_to_first_consultant_appointment) %>% 
+  mutate(x1 = case_when(is.na(x1) ~ 'dates',
+                        TRUE ~ x1),
+         x2 = case_when(is.na(x2) ~ 'blank',
+                        TRUE ~x2)) %>% 
+  filter(x1 != 'Operational Standard = 93%') 
+
+
+
+# switch rows for dates to below header -----------------------------------
+
+weekWaitDate <- weekWait %>% 
+  slice(1) %>% 
+  pivot_longer(cols = -c(x1, x2),
+               names_to = "categories",
+               values_to = "values") %>% 
+  fill(values, .direction = "down") %>% 
+  pivot_wider(names_from = categories,
+              values_from = values)
+
+weekWaitAll <- weekWaitDate %>% 
+  union_all(weekWaitAll)
