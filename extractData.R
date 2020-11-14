@@ -18,9 +18,9 @@ if(!dir.exists("data")) {
 
 # Download file
 download.file("https://www.england.nhs.uk/statistics/wp-content/uploads/sites/2/2020/11/Cancer-Waiting-Times-Commissioner-Time-Series-Apr-2011-Sep-2020-with-Revisions-2.xlsx",
-                     destfile = "data/cancerWaitingTimes.xlsx",
-                     method = "wininet",
-                     mode = "wb")                 
+              destfile = "data/cancerWaitingTimes.xlsx",
+              method = "wininet",
+              mode = "wb")                 
 
 # Extract all worksheets to individual csv -------------------------------------------------------------
 
@@ -88,7 +88,7 @@ weekWaitDate <- weekWait %>%
   mutate(ExcelSerialDate = case_when(stri_length(values) == 5 ~ excel_numeric_to_date(as.numeric(values), date_system = "modern")),
          ExcelSerialDate = as.character(ExcelSerialDate),
          values = case_when(!is.na(ExcelSerialDate) ~ ExcelSerialDate,
-                          TRUE ~ values)) %>% 
+                            TRUE ~ values)) %>% 
   select(-ExcelSerialDate) %>% 
   pivot_wider(names_from = categories,
               values_from = values) 
@@ -97,3 +97,4 @@ weekWaitDate <- weekWait %>%
 weekWaitComplete <- weekWaitDate %>% 
   union_all(weekWaitAll %>% 
               filter(x1 != 'dates'))
+
