@@ -85,9 +85,11 @@ weekWaitDate <- weekWait %>%
                names_to = "categories",
                values_to = "values") %>% 
   fill(values, .direction = "down") %>% 
-  # strips the dates which are written out and have no data
-  mutate(values = excel_numeric_to_date(as.numeric(values), date_system = "modern"),
-         values = as.character(values)) %>% 
+  mutate(ExcelSerialDate = case_when(stri_length(values) == 5 ~ excel_numeric_to_date(as.numeric(values), date_system = "modern")),
+         ExcelSerialDate = as.character(ExcelSerialDate),
+         values = case_when(!is.na(ExcelSerialDate) ~ ExcelSerialDate,
+                          TRUE ~ values)) %>% 
+  select(-ExcelSerialDate) %>% 
   pivot_wider(names_from = categories,
               values_from = values) 
 
